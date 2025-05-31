@@ -1,6 +1,7 @@
 module com.example.filemanager {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
 
 
     opens com.example.filemanager to javafx.fxml;
