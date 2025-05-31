@@ -1,38 +1,52 @@
 package com.example.filemanager.services;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import com.example.filemanager.models.FileModel;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseService {
-    private static final String URL = "jdbc:mysql://localhost:3306/filemanager_db?useSSL=false";
-    private static final String USER = "root";
-    private static final String PASSWORD = "dbms123";
+    // ... [previous connection code]
 
-    private Connection connection;
+    public void addFile(FileModel file) throws SQLException {
+        String sql = "INSERT INTO files (id, original_name, system_name, file_path, file_type, size, created_at, modified_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public DatabaseService() {
-        try{
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            initializeDatabase();
-        }catch (SQLException e){
-            System.err.println("Database connection failed: "+e.getMessage());
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, file.getId());
+            statement.setString(2, file.getOriginalName());
+            statement.setString(3, file.getSystemName());
+            statement.setString(4, file.getFilePath());
+            statement.setString(5, file.getFileType());
+            statement.setLong(6, file.getSize());
+            statement.setTimestamp(7, new Timestamp(file.getCreatedAt().getTime()));
+            statement.setTimestamp(8, new Timestamp(file.getModifiedAt().getTime()));
+
+            statement.executeUpdate();
         }
     }
 
-    private void initializeDatabase() throws SQLException {
+    public List<FileModel> searchFiles(String query) throws SQLException {
+        List<FileModel> results = new ArrayList<>();
+        String sql = "SELECT * FROM files WHERE original_name LIKE ? OR file_type LIKE ?";
 
-        String sql = "CREATE TABLE IF NOT EXISTS files (" +
-                "id VARCHAR(36) PRIMARY KEY," +
-                "original_name VARCHAR(255)," +
-                "system_name VARCHAR(255)," +
-                "file_path TEXT," +
-                "file_type VARCHAR(50)," +
-                "size BIGINT," +
-                "created_at TIMESTAMP," +
-                "modified_at TIMESTAMP," +
-                "owner_id VARCHAR(36)" +
-                ")";
-        connection.createStatement().execute(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, "%" + query + "%");
+            statement.setString(2, "%" + query + "%");
+
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                FileModel file = new FileModel();
+                file.setId(rs.getString("id"));
+                file.setOriginalName(rs.getString("original_name"));
+                file.setFilePath(rs.getString("file_path"));
+                // Set other fields...
+
+                results.add(file);
+            }
+        }
+
+        return results;
     }
 }
