@@ -1,11 +1,9 @@
 package com.example.filemanager;
 
-import com.example.filemanager.controllers.HelloController;
+import com.example.filemanager.controllers.FileController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -17,14 +15,15 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("hello-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/filemanager/hello-view.fxml"));
         BorderPane root = loader.load();
 
-        // Get controller and pass components if needed
-        HelloController controller = loader.getController();
+        // Get the controller (now using FileController)
+        FileController controller = loader.getController();
 
+        // Initialize the file browser and pass it to the controller
         TreeView<String> fileBrowser = createFileBrowser("C:");
-        root.setCenter(fileBrowser);
+        controller.setDirectoryTree(fileBrowser); // You'll need to add this method to FileController
 
         Scene scene = new Scene(root, 1000, 700);
         primaryStage.setTitle("AI File Manager");
@@ -50,31 +49,10 @@ public class HelloApplication extends Application {
 
         rootItem.addEventHandler(TreeItem.<String>branchExpandedEvent(), event -> {
             TreeItem<String> item = event.getTreeItem();
-            if (item.getChildren().isEmpty()  &&
+            if (!item.getChildren().isEmpty() &&
                     item.getChildren().get(0).getValue().equals("Loading...")) {
 
-                //clear the placeholder
-                item.getChildren().clear();
-
-                //Load directory contents in background thread
-                new Thread(() -> {
-                    File dir = new File(getFullPath(item));
-                    File[] children = dir.listFiles();
-
-                    if (children != null) {
-                        Platform.runLater(()->{
-                            for (File file : children) {
-                                TreeItem<String> newItem = new TreeItem<>(file.getName());
-                                item.getChildren().add(newItem);
-
-                                if (file.isDirectory()) {
-                                    newItem.getChildren().add(new TreeItem<>("Loading..."));
-                                }
-                            }
-                        });
-                    }
-
-                }).start();
+                new Thread(() -> loadDirectoryContents(item)).start();
             }
         });
 
@@ -82,23 +60,24 @@ public class HelloApplication extends Application {
     }
 
     private void loadDirectoryContents(TreeItem<String> parentItem) {
-        Platform.runLater(() -> parentItem.getChildren().clear());
+        Platform.runLater(() -> {
+            // Clear the "Loading..." placeholder
+            parentItem.getChildren().clear();
 
-        File dir = new File(getFullPath(parentItem));
-        if (dir.listFiles() != null) {
-            for (File file : dir.listFiles()) {
-                Platform.runLater(() ->
-                        parentItem.getChildren().add(createFileTreeItem(file))
-                );
+            File dir = new File(getFullPath(parentItem));
+            File[] children = dir.listFiles();
+
+            if (children != null) {
+                for (File file : children) {
+                    TreeItem<String> newItem = createFileTreeItem(file);
+                    parentItem.getChildren().add(newItem);
+                }
             }
-        }
+        });
     }
 
     private TreeItem<String> createFileTreeItem(File file) {
         TreeItem<String> item = new TreeItem<>(file.getName());
-
-        // Set icon based on file type
-        // item.setGraphic(getIconForFile(file));
 
         if (file.isDirectory()) {
             item.getChildren().add(new TreeItem<>("Loading..."));
