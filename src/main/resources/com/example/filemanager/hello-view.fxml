@@ -2,10 +2,12 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.filemanager.controllers.HelloController">
+            fx:controller="com.example.filemanager.controllers.FileController">
 
     <!-- Top: Toolbar -->
     <top>
@@ -19,19 +21,13 @@
         </ToolBar>
     </top>
 
-    <!-- Left: Will be filled with directory tree programmatically -->
+    <!-- Left: Directory Tree -->
     <left>
-        <!-- Placeholder - will be replaced with actual TreeView -->
-        <Label text="Directories will appear here"
-               style="-fx-padding: 10px; -fx-font-style: italic;"/>
+        <TreeView fx:id="directoryTree" style="-fx-pref-width: 250px;"/>
     </left>
 
-    <!-- Center: Will contain the file browser TreeView -->
+    <!-- Center: File Table -->
     <center>
-        <!-- Placeholder - will be replaced with actual TreeView -->
-        <Label text="File browser will appear here"
-               style="-fx-padding: 10px; -fx-font-style: italic;"/>
-
         <TableView fx:id="filesTable">
             <columns>
                 <TableColumn fx:id="nameColumn" text="Name" prefWidth="200"/>
