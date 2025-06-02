@@ -7,6 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseService {
+    private static final String URL = "jdbc:mysql://localhost:3306/filemanager_db";
+    private static final String USER = "root";
+    private static final String PASSWORD = "dbms123";
+
+    private Connection connection; // Add this field declaration
+
     // ... [previous connection code]
 
     public void addFile(FileModel file) throws SQLException {
@@ -16,7 +22,7 @@ public class DatabaseService {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, file.getId());
             statement.setString(2, file.getOriginalName());
-            statement.setString(3, file.getSystemName());
+            statement.setString(3, file.getDisplayName());
             statement.setString(4, file.getFilePath());
             statement.setString(5, file.getFileType());
             statement.setLong(6, file.getSize());

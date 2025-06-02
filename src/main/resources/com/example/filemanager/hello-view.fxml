@@ -1,16 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.filemanager.controllers.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.filemanager.controllers.HelloController">
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+    <!-- Top: Toolbar -->
+    <top>
+        <ToolBar>
+            <Button text="Home" onAction="#handleHome"/>
+            <Button text="Refresh" onAction="#handleRefresh"/>
+            <Separator />
+            <TextField fx:id="searchField" promptText="Search files..."
+                       style="-fx-pref-width: 300px;"/>
+            <Button text="Search" onAction="#handleSearch"/>
+        </ToolBar>
+    </top>
+
+    <!-- Left: Will be filled with directory tree programmatically -->
+    <left>
+        <!-- Placeholder - will be replaced with actual TreeView -->
+        <Label text="Directories will appear here"
+               style="-fx-padding: 10px; -fx-font-style: italic;"/>
+    </left>
+
+    <!-- Center: Will contain the file browser TreeView -->
+    <center>
+        <!-- Placeholder - will be replaced with actual TreeView -->
+        <Label text="File browser will appear here"
+               style="-fx-padding: 10px; -fx-font-style: italic;"/>
+
+        <TableView fx:id="filesTable">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Name" prefWidth="200"/>
+                <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
+                <TableColumn fx:id="sizeColumn" text="Size" prefWidth="80"/>
+                <TableColumn fx:id="modifiedColumn" text="Modified" prefWidth="150"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <!-- Bottom: Status Bar -->
+    <bottom>
+        <HBox style="-fx-background-color: #f0f0f0; -fx-padding: 5px;">
+            <Label fx:id="statusLabel" text="Ready" style="-fx-font-weight: bold;"/>
+        </HBox>
+    </bottom>
+</BorderPane>
